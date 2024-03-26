@@ -50,3 +50,5 @@ Put all haplotypes together (assumes you already have PanSN-ed CHM13v2 and PanSN
 zcat chm13v2.0.fa.gz grch38.fa.gz hg002v101.fa.gz mGorGor1.fa.gz mPanPan1.fa.gz mPanTro3.fa.gz mPonAbe1.fa.gz mPonPyg2.fa.gz mSymSyn1.fa.gz | bgzip -@ 48 -l 9 > primates16.20231205.fa.gz
 samtools faidx primates16.20231205.fa.gz
 ```
+
+You can find the final FASTA file at https://garrisonlab.s3.amazonaws.com/t2t-primates/primates16.20231205.fa.gz.
