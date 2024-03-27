@@ -5,21 +5,32 @@ All-to-all whole genome alignments and implicit pangenome graph model of a great
 
 ## overview
 
+## data
+
+See [data](data/README.md).
+
 ## methods
 
-### WFMASH alignments & viz
+### WFMASH alignments & paf2chain
+
+See [alignment](alignment/README.md).
 
 ### Implicit pangenome graph (impg)
 
+See [impg](impg/README.md).
+
 ### wgatools pseudo-MAF (pMAF)
 
+See [wgatools](wgatools/README.md).
+
 ### Conservation analyses (Giulio)
-Model 1
-Model 2
+
+See [conservation](conservation/README.md).
 
 ### Divergence
 
+See [divergence](divergence/README.md).
+
 ### ILS
 
-
-
+See [ils](ils/README.md).
