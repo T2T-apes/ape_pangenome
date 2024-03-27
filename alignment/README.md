@@ -67,7 +67,7 @@ cut -f 1,2 $PATH_PRIMATES16_FASTA.fai -d '#' | sort | uniq | while read TARGET; 
 done
 ```
 
-### Chains
+## Chains
 
 We use [`paf2chain`](https://github.com/AndreaGuarracino/paf2chain) to convert aligned PAF files into CHAIN files:
 
@@ -81,7 +81,7 @@ ls $DIR_BASE/alignment/*.p70.*.paf.gz | while read PAF; do
 done
 ```
 
-### Results
+## Results
 
 You can find:
 - the mapping PAF files at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/mappings/
