@@ -1,4 +1,4 @@
-# alignment
+# alignment and chains
 
 Set your paths:
 
@@ -6,6 +6,7 @@ Set your paths:
 DIR_BASE=/path/to/primates
 PATH_PRIMATES16_FASTA=/path/to/primates16.20231205.fa.gz
 WFMASH=/path/to/wfmash/build/bin/wfmash-d7b696087f634f25e4b3de7dd521e1c4bfa3cf0e # wfmash v0.13.0, commit d7b696087f634f25e4b3de7dd521e1c4bfa3cf0e
+PAF2CHAIN=/path/to/paf2chain/target/release/paf2chain
 ```
 
 ## Mapping
@@ -36,7 +37,7 @@ cut -f 1,2 $PATH_PRIMATES16_FASTA.fai -d '#' | sort | uniq | while read TARGET; 
 done
 ```
 
-We use `mashmap3`, integrated in `wfmash` and invoked with the `-m` parameter. Each iteration works by splitting each query genome into overlapping 5kb segments (`-s`) and mapping each segment to the current target. The mappings are then filtered to keep only those with >70% identity (`-p`) and a cumulative length >20kb (`-c`).
+We use `mashmap3`, integrated in [`wfmash`](https://github.com/waveygang/wfmash) and invoked with the `-m` parameter. Each iteration works by splitting each query genome into overlapping 5kb segments (`-s`) and mapping each segment to the current target. The mappings are then filtered to keep only those with >70% identity (`-p`) and a cumulative length >20kb (`-c`).
 
 ## Alignment
 
@@ -65,7 +66,24 @@ cut -f 1,2 $PATH_PRIMATES16_FASTA.fai -d '#' | sort | uniq | while read TARGET; 
         2> $DIR_BASE/alignment/$TARGET.p70.aln.log"
 done
 ```
+
+### Chains
+
+We use [`paf2chain`](https://github.com/AndreaGuarracino/paf2chain) to convert aligned PAF files into CHAIN files:
+
+```shell
+cd $DIR_BASE/alignment
+ls $DIR_BASE/alignment/*.p70.*.paf.gz | while read PAF; do
+    NAME=$(basename $PAF .paf.gz)
+    echo $NAME
+
+    $PAF2CHAIN --input $PAF | pigz -9 > $NAME.chain.gz
+done
+```
+
+### Results
+
 You can find:
 - the mapping PAF files at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/mappings/
 - the aligned PAF files at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/alignments/ 
-
+- the CHAIN files at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/chains/ 
