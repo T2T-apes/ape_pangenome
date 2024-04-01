@@ -62,7 +62,7 @@ ls $NAME.filter10Mb/*.maf | while read MAF; do
     replace_cmd=""
     grep -wFf <(cut -f 2 $MAF | sed '1d') $DIR_BASE/conservation/name2species.tsv | while IFS=$'\t' read -r key val; do
         # \b: the word boundary ensures that the match occurs only if the pattern is followed by a non-word character or the end of the line.
-        # It avoid that chm13#1#chr1 matches also chm13#1#chr10, chm13#1#chr11, ...
+        # It avoids that chm13#1#chr1 matches also chm13#1#chr10, chm13#1#chr11, ...
         replace_cmd+="s/$key\b/$val/;"
     done
 
