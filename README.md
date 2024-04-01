@@ -5,11 +5,9 @@ All-to-all whole genome alignments and implicit pangenome graph model of a great
 
 ## overview
 
-## data
+## assemblies
 
-See [data](data/README.md).
-
-## methods
+See [assemblies](assemblies/README.md).
 
 ### WFMASH alignments & paf2chain
 
