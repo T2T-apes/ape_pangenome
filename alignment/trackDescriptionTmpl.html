@@ -1,9 +1,9 @@
 <h2>Description</h2>
-This set of tracks provides per base alignment for all T2T primate assemblies by the Telomere-to-Telomere consortium.
+This set of tracks provides per base alignment for all T2T primate assemblies by the Telomere-to-Telomere consortium and the draft human pangenome reference assemblies by the Human Pangenome Reference Consortium.
 
 <h2>Methods</h2>
 <ul>
-    <li>We applied <a href="https://github.com/waveygang/wfmash">WFMASH</a> to align all T2T primate assemblies using each one as reference. We filtered out alignments shorter than 50kbp.</li>
+    <li>We applied <a href="https://github.com/waveygang/wfmash">WFMASH</a> to align all assemblies against all T2T primate assemblies using each one as reference. We filtered out alignments shorter than 50kbp and/or with identity lower than ~70%.</li>
     <li>We used <a href="https://github.com/AndreaGuarracino/paf2chain">PAF2CHAIN</a> to convert aligned PAF files to CHAIN files.</li>
 </ul>
 

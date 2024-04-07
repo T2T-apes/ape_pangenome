@@ -41,6 +41,13 @@ done
 
 We use `mashmap3`, integrated in [`wfmash`](https://github.com/waveygang/wfmash) and invoked with the `-m` parameter. Each iteration works by splitting each query genome into overlapping 5kb segments (`-s`) and mapping each segment to the current target. The mappings are then filtered to keep only those with >70% identity (`-p`) and a cumulative length >20kb (`-c`).
 
+Upload on `garrisonlab` bucket:
+
+```shell
+pigz -9
+ls *p70*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mapings/$f; done
+```
+
 ### Alignment
 
 We use the mapping PAF files generated in the previous step as input to guide the alignment process in `wfmash`. This results in aligned PAF files for each target sequence which include CIGAR strings (in the same format that can be obtained with `minimap2 --eqx`) usable in `rustybam`, `seqwish`, and other tools.
@@ -69,6 +76,13 @@ cut -f 1,2 $PATH_PRIMATES16_FASTA.fai -d '#' | sort | uniq | while read TARGET; 
 done
 ```
 
+Upload on `garrisonlab` bucket:
+
+```shell
+pigz -9
+ls *p70*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/alignments/$f; done
+```
+
 ### Chains
 
 We use [`paf2chain`](https://github.com/AndreaGuarracino/paf2chain) to convert aligned PAF files into CHAIN files:
@@ -81,6 +95,12 @@ ls $DIR_BASE/alignment/*.p70.*.paf.gz | while read PAF; do
 
     $PAF2CHAIN --input $PAF | pigz -9 > $NAME.chain.gz
 done
+```
+
+Upload on `garrisonlab` bucket:
+
+```shell
+ls *p70*.chain.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/chains/$f; done
 ```
 
 ## HPRCy1-vs-primates
@@ -118,6 +138,13 @@ cut -f 1,2 $PATH_PRIMATES16_FASTA.fai -d '#' | sort | uniq | while read TARGET; 
 done
 ```
 
+Upload on `garrisonlab` bucket:
+
+```shell
+pigz -9 *paf
+ls HPRCy1-vs-*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mappings/$f; done
+```
+
 ### Alignment
 
 ```shell
@@ -143,8 +170,13 @@ cut -f 1,2 $PATH_PRIMATES16_FASTA.fai -d '#' | sort | uniq | while read TARGET; 
             2> $DIR_BASE/alignment/HPRCy1-vs-$TARGET.p$p.aln.log"
     done
 done
+```
 
+Upload on `garrisonlab` bucket:
+
+```shell
 pigz -9 *paf
+ls HPRCy1-vs-*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/alignments/$f; done
 ```
 
 ### Chains
@@ -157,6 +189,12 @@ cut -f 1,2 $PATH_PRIMATES16_FASTA.fai -d '#' | sort | uniq | while read TARGET; 
 
     $PAF2CHAIN --input $DIR_BASE/alignment/HPRCy1-vs-$TARGET.p$p.aln.paf | pigz -9 > $DIR_BASE/alignment/HPRCy1-vs-$TARGET.p$p.aln.chain.gz
 done
+```
+
+Upload on `garrisonlab` bucket:
+
+```shell
+ls HPRCy1-vs-*.chain.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/chains/$f; done
 ```
 
 ## Results
