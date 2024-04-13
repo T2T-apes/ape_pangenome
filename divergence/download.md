@@ -1,6 +1,22 @@
 # Download information
 ----------------------
 
+Download and install AWS commandline tools.
+```
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+./aws/install --bin-dir ~/.local/bin/ --install-dir ~/.local/aws-cli
+aws --version
+```
+
+Make an AWS account here: [https://aws.amazon.com/](https://aws.amazon.com/).
+
+Configure your keys in the AWS commandline tools.
+```
+aws configure 
+```
+and then enter the keys (first two lines) and then just click enter for others.
+
 Download data from [AWS](https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/mafs/).
 
 Download alignments (PAFs).
