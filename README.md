@@ -5,7 +5,7 @@ All-to-all whole genome alignments and implicit pangenome graph model of a great
 
 ## overview
 
-## assemblies
+### assemblies
 
 See [assemblies](assemblies/README.md).
 

@@ -12,8 +12,10 @@ PATH_ALL_VS_CHM13_PAF=/path/to/primates/alignment/chm13#1.p70.aln.paf.gz
 WGATOOLS=/path/to/wgatools/result/bin/wgatools
 MAF_STREAM=/path/to/maf_stream/target/release/maf_stream
 MSA_VIEW=/path/to/phast-v1_5/bin/msa_view
+MSA_SPLIT=/path/to/tools/phast-v1_5/bin/msa_split
 PHYLOFIT=/path/to/phast-v1_5/bin/phyloFit
 PHASTCONS=/path/to/phast-v1_5/bin/phastCons
+WIGTOBIGWIG=/path/to/wigToBigWig
 ```
 
 We need to:
@@ -76,7 +78,7 @@ Grid-search:
 
 ```shell
 cd $DIR_BASE/conservation/$NAME.filter10Mb
-lens=(1 $(seq 50 50 30000)) # The min. length is 1
+lens=(1 $(seq 50 50 30000)) # The min. length can be 1
 
 for len in "${lens[@]}"; do 
     printf "${len}\n"
@@ -93,8 +95,44 @@ ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | while read MAF; do
     cd $DIR_OUTPUT
     zgrep "^$CHR" -w $DIR_BASE/data/chm13v2.0_RefSeq_Liftoff_v5.1.gff3.gz | grep 'exon' | sed "s/$CHR/Homo_sapiens/g" > $DIR_OUTPUT/$CHR.chm13.exon.gff
     sort -k1,1 -k4,4n $DIR_OUTPUT/$CHR.chm13.exon.gff | bedtools merge > $DIR_OUTPUT/$CHR.chm13.exon.bed
-    $MSA_VIEW $MAF --in-format MAF --4d --features $DIR_OUTPUT/$CHR.chm13.exon.gff > $DIR_OUTPUT/$CHR.4d-codons.ss
-    $MSA_VIEW $DIR_OUTPUT/$CHR.4d-codons.ss --in-format SS --out-format SS --tuple-size 1 > $DIR_OUTPUT/$CHR.4d-sites.ss
+
+    # chr2 has a too big MAF file, we need to process it differently'
+    if [[ "$CHR" == "chr2" ]]; then
+        # Chunk the MAF file in blocks 1 Mbp long
+        $WGATOOLS chunk -l 1000000 $MAF -o xxx.maf
+
+        # Divide the chunks in separated MAF files
+        awk 'BEGIN {file="block00001.maf"} /^a score=/{file=sprintf("block%05d.maf", ++i)} {print > file}' xxx.maf
+
+        # Remove sequences that have only gaps in the block
+        ls block*.maf | while read MAF2; do
+            PREFIX=$(basename $MAF2 .maf)
+            echo $MAF2 $PREFIX
+
+            awk '
+                # If line starts with "s" and the sequence is only gaps, skip it
+                /^s/ {
+                    if ($7 ~ /^-+$/) next;
+                }
+                # Print all other lines
+                { print }
+            ' $MAF2 > filtered_$MAF2
+        done
+
+        ls filtered_block*.maf | while read MAF2; do
+            PREFIX=$(basename $MAF2 .maf)
+            echo $MAF2 $PREFIX
+            
+            $MSA_VIEW $MAF2 --in-format MAF --4d --features $DIR_OUTPUT/$CHR.chm13.exon.gff > $DIR_OUTPUT/$PREFIX.$CHR.4d-codons.ss
+            $MSA_VIEW $DIR_OUTPUT/$PREFIX.$CHR.4d-codons.ss --in-format SS --out-format SS --tuple-size 1 > $DIR_OUTPUT/$PREFIX.$CHR.4d-sites.ss
+        done
+        find . -type f -name "filtered_block*.$CHR.4d-sites.ss" -size 0 -exec rm {} + # To avoid errors for the aggregation because of empty files
+        # https://github.com/CshlSiepelLab/phast/issues/10#issuecomment-387370910
+        $MSA_VIEW --unordered-ss --out-format SS --aggregate Homo_sapiens,Pongo_abelii,Pan_troglodytes,Pan_paniscus,Symphalangus_syndactylus,Pongo_pygmaeus,Gorilla_gorilla filtered_block*.$CHR.4d-sites.ss > $CHR.4d-sites.ss
+    else
+        $MSA_VIEW $MAF --in-format MAF --4d --features $DIR_OUTPUT/$CHR.chm13.exon.gff > $DIR_OUTPUT/$CHR.4d-codons.ss
+        $MSA_VIEW $DIR_OUTPUT/$CHR.4d-codons.ss --in-format SS --out-format SS --tuple-size 1 > $DIR_OUTPUT/$CHR.4d-sites.ss
+    fi
     $PHYLOFIT --tree $DIR_BASE/data/primate_tree.nwk --msa-format SS --out-root $DIR_OUTPUT/$CHR.4d $DIR_OUTPUT/$CHR.4d-sites.ss
     
     mkdir -p $DIR_OUTPUT/LOG
@@ -107,7 +145,7 @@ done
 Collect results:
 
 ```shell
-(seq 1 22; echo X; echo Y) | while read c; do
+(seq 1 22; echo X; echo Y) | grep 2 -w | while read c; do
     CHR=chr$c
     echo $CHR
     cd $DIR_BASE/conservation/$NAME.filter10Mb/$CHR
@@ -120,8 +158,59 @@ Collect results:
     done > $CHR.jaccards.tsv
 done
 
+# See the winning combinations
 (echo chr len tc jaccard; (seq 1 22; echo X; echo Y) | while read c; do
     CHR=chr$c
     sort -k 5,5n $CHR/*.jaccards.tsv | tail -n 1 | awk -v OFS='\t' -v chr=$CHR '{print(chr,$1,$2,$5)}'
 done) | column -t
+    # chr    len    tc    jaccard
+    # chr1   100    0.50  0.119494
+    # chr2   50     0.50  0.102332
+    # chr3   100    0.50  0.112459
+    # chr4   50     0.50  0.0955686
+    # chr5   50     0.50  0.0909732
+    # chr6   50     0.50  0.109537
+    # chr7   100    0.05  0.0909672
+    # chr8   50     0.15  0.0940339
+    # chr9   1500   0.05  0.103596
+    # chr10  200    0.50  0.106136
+    # chr11  50     0.50  0.118712
+    # chr12  350    0.50  0.129967
+    # chr13  25550  0.55  0.143974
+    # chr14  50     0.50  0.0949572
+    # chr15  50     0.50  0.107186
+    # chr16  50     0.05  0.0963623
+    # chr17  50     0.25  0.117952
+    # chr18  150    0.50  0.0960978
+    # chr19  400    0.50  0.160333
+    # chr20  1750   0.05  0.103978
+    # chr21  29650  0.55  0.170273
+    # chr22  50     0.45  0.0971152
+    # chrX   200    0.50  0.137221
+    # chrY   250    0.35  0.0461294
 ```
+
+Compute the final tracks:
+
+```shell
+cat $PATH_PRIMATES16_CLEAN_FASTA.fai | grep chm13 | cut -f 1,2 > $DIR_BASE/conservation/$NAME.filter10Mb/chm13.chrom.sizes
+
+ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | sort -V | while read MAF; do
+    CHR_WITH_SUFFIX="${MAF##*#chr}"
+    CHROMOSOME_NUM="${CHR_WITH_SUFFIX%%.*}"
+    CHR="chr${CHROMOSOME_NUM}"
+    echo $MAF $CHR
+
+    DIR_OUTPUT=$DIR_BASE/conservation/$NAME.filter10Mb/$CHR
+
+    len=$(sort -k 5,5n $DIR_OUTPUT/*.jaccards.tsv | tail -n 1 | cut -f 1)
+    tc=$(sort -k 5,5n $DIR_OUTPUT/*.jaccards.tsv | tail -n 1 | cut -f 2)
+
+    sbatch -c 96 -p tux --wrap "hostname; cd $DIR_BASE/conservation/$NAME.filter10Mb/; $PHASTCONS --most-conserved $DIR_OUTPUT/ELEMENTS/$CHR.conserved.$tc.$len.bed --target-coverage $tc --expected-length $len --rho 0.3 --msa-format MAF $MAF $DIR_OUTPUT/$CHR.4d.mod > $DIR_OUTPUT/SCORES/chm13#1.$CHR.scores.$tc.$len.wig; $WIGTOBIGWIG $DIR_OUTPUT/SCORES/chm13#1.$CHR.scores.$tc.$len.wig $DIR_BASE/conservation/$NAME.filter10Mb/chm13.chrom.sizes $DIR_OUTPUT/SCORES/chm13#1.$CHR.scores.$tc.$len.bw"
+done
+```
+
+## Results
+
+You can find:
+- the convervation tracks at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/conservation_track_2/
