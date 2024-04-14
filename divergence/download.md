@@ -67,6 +67,7 @@ cd mafs
 mkdir chm13#1
 cd chm13#1
 aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "chm13#1*"
+rm *chrM*
 cd ..
 ```
 
@@ -74,6 +75,7 @@ cd ..
 mkdir hg002#M
 cd hg002#M
 aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "hg002#M*"
+rm *chrM*
 cd ..
 
 mkdir hg002#P
