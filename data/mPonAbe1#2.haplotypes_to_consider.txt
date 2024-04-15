@@ -1,0 +1,12 @@
+mPonAbe1#2
+chm13#1
+mGorGor1#M
+mPanPan1#P
+mPanTro3#1
+mPonPyg2#1
+mSymSyn1#2
+mGorGor1#P#chrY
+mPanPan1#M#chrX
+mPanTro3#2#chrY
+mPonPyg2#2#chrY
+mSymSyn1#1#chrX

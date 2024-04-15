@@ -49,6 +49,7 @@ From the all-vs-target alignments in PAF format:
 ```shell
 ls $DIR_ALL_VS_TARGET_ALIGNMENTS/*.p70.aln.paf.gz | grep HPRCy1 -v | while read PATH_ALL_VS_TARGET_PAF; do
     NAME=$(basename $PATH_ALL_VS_TARGET_PAF .paf.gz)
+    SPECIES=$(basename $NAME .p70.aln)
 
     cd /scratch
     $WGATOOLS filter -f paf -a 10000000 <(zcat $PATH_ALL_VS_TARGET_PAF) -o $NAME.filter10Mb.paf -r -t 48
@@ -68,7 +69,7 @@ ls $DIR_ALL_VS_TARGET_ALIGNMENTS/*.p70.aln.paf.gz | grep HPRCy1 -v | while read 
             replace_cmd+="s/$key\b/$val/;"
         done
         head -1 $MAF > $DIR_BASE/conservation/$NAME.filter10Mb/$REF.filtered.maf
-        grep -f $DIR_BASE/data/haplotypes_to_consider.txt $MAF | sed $replace_cmd >> $DIR_BASE/conservation/$NAME.filter10Mb/$REF.filtered.maf
+        grep -f $DIR_BASE/data/$SPECIES.haplotypes_to_consider.txt $MAF | sed $replace_cmd >> $DIR_BASE/conservation/$NAME.filter10Mb/$REF.filtered.maf
 
         cat $MAF | bgzip -l 9 -@ 96 > $DIR_BASE/conservation/$NAME.filter10Mb/$REF.filtered.all-haplotypes.maf.gz
     done
@@ -84,6 +85,9 @@ cd $DIR_BASE/conservation/approach1
 
 #PATH_ALL_VS_TARGET_PAF=/lizardfs/guarracino/primates/alignment/chm13#1.p70.aln.paf.gz
 PATH_ALL_VS_TARGET_PAF=/lizardfs/guarracino/primates/alignment/grch38#1.p70.aln.paf.gz
+PATH_ALL_VS_TARGET_PAF=/lizardfs/guarracino/primates/alignment/hg002#M.p70.aln.paf.gz
+PATH_ALL_VS_TARGET_PAF=/lizardfs/guarracino/primates/alignment/hg002#P.p70.aln.paf.gz
+
 NAME=$(basename $PATH_ALL_VS_TARGET_PAF .paf.gz)
 
 ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | while read MAF; do
@@ -133,7 +137,7 @@ ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | while read MAF; do
     mkdir -p $DIR_OUTPUT/ELEMENTS $DIR_OUTPUT/SCORES
     for file in $DIR_OUTPUT/CHUNKS/*.*.ss ; do
         root=`basename $file .ss` 
-        sbatch -c 2 -p allnodes --wrap="$PHASTCONS --most-conserved $DIR_OUTPUT/ELEMENTS/$root.bed --score $file $DIR_OUTPUT/ave.cons.mod,$DIR_OUTPUT/ave.noncons.mod > $DIR_OUTPUT/SCORES/$root.wig"
+        sbatch -c 2 -p allnodes --wrap="$PHASTCONS --most-conserved $DIR_OUTPUT/ELEMENTS/$root.bed --score $file $DIR_OUTPUT/ave.cons.mod,$DIR_OUTPUT/ave.noncons.mod > $DIR_OUTPUT/SCORES/$root.scores.wig"
     done
 done
 
@@ -149,10 +153,10 @@ ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | while read MAF; do
 
     # Concatenate WIG files in coordinate order
     cd $DIR_OUTPUT/SCORES
-    cat $(ls -1 *-*.wig | awk -F'[.-]' '{print $2"\t"$3"\t"$0}' | sort -nk1 | cut -f 3) > $MAF_NAME.wig
+    cat $(ls -1 *-*.wig | awk -F'[.-]' '{print $2"\t"$3"\t"$0}' | sort -nk1 | cut -f 3) > $MAF_NAME.scores.wig
     cd ..
 
-    $WIGTOBIGWIG $DIR_OUTPUT/SCORES/$MAF_NAME.wig $DIR_BASE/conservation/chrom.sizes $DIR_OUTPUT/SCORES/$MAF_NAME.bw
+    $WIGTOBIGWIG $DIR_OUTPUT/SCORES/$MAF_NAME.scores.wig $DIR_BASE/conservation/chrom.sizes $DIR_OUTPUT/SCORES/$MAF_NAME.scores.bw
 done
 ```
 
@@ -285,7 +289,7 @@ done) | column -t
     # chrY   250    0.35  0.0461294
 ```
 
-Compute the final tracks:
+Compute the chunks:
 
 ```shell
 ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | sort -V | while read MAF; do
@@ -305,14 +309,16 @@ ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | sort -V | while read MAF; do
 done
 ```
 
-Combine:
+Combine chromosomes:
 
 ```shell
+NAME=chm13#1.p70.aln
+REF=chm13#1
 mkdir -p $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED
 ls $DIR_BASE/conservation/approach2/$NAME.filter10Mb/chr*/SCORES/*wig.gz | sort -V | while read WIG; do
     zcat $WIG
-done > $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$NAME.score.wig
-$WIGTOBIGWIG $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$NAME.score.wig $DIR_BASE/conservation/chrom.sizes $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$NAME.score.bw
+done > $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$REF.scores.wig
+$WIGTOBIGWIG $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$REF.scores.wig $DIR_BASE/conservation/chrom.sizes $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$REF.scores.bw
 
 ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | sort -V | while read MAF; do
     MAF_NAME=$(basename $MAF .filtered.maf)
@@ -328,11 +334,9 @@ ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | sort -V | while read MAF; do
     tc=$(sort -k 5,5n $DIR_OUTPUT/*.jaccards.tsv | tail -n 1 | cut -f 2)
 
     zcat $DIR_OUTPUT/ELEMENTS/$CHR.conserved.$tc.$len.bed
-done | bgzip -l 9 -@ 38 > $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$NAME.conserved.bed.gz
+done | sort -k1,1 -k2,2n > $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$REF.most_conserved.bed
 ```
 
 ## Results
 
-Conservation tracks and conserved elements can be found for the
-- approach 1 at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/conservation_approach1/
-- approach 2 at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/conservation_approach2/
+Conservation tracks and conserved elements at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/conservation/
