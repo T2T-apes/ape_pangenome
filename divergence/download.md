@@ -80,7 +80,7 @@ cd ..
 
 mkdir hg002#P
 cd hg002#P
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ hg002#P#chrY_PATERNAL.filtered10Mb.maf.gz .
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/hg002#P#chrY_PATERNAL.filtered10Mb.maf.gz .
 cd ..
 ```
 
