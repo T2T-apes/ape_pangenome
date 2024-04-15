@@ -66,7 +66,7 @@ cd mafs
 ```
 mkdir chm13#1
 cd chm13#1
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "chm13#1*"
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "chm13#1*filtered10Mb.maf.gz"
 rm *chrM*
 cd ..
 ```
@@ -74,25 +74,25 @@ cd ..
 ```
 mkdir hg002#M
 cd hg002#M
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "hg002#M*"
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "hg002#M*filtered10Mb.maf.gz"
 rm *chrM*
 cd ..
 
 mkdir hg002#P
 cd hg002#P
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/hg002#P#chrY_PATERNAL.maf.gz .
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ hg002#P#chrY_PATERNAL.filtered10Mb.maf.gz .
 cd ..
 ```
 
 ```
 mkdir mPanTro3#1
 cd mPanTro3#1
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "mPanTro3#1*"
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "mPanTro3#1*filtered10Mb.maf.gz"
 cd ..
 
 mkdir mPanTro3#2
 cd mPanTro3#2
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/mPanTro3#2#chrY_hap2_hsaY.maf.gz .
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/mPanTro3#2#chrY_hap2_hsaY.filtered10Mb.maf.gz .
 cd ..
 ```
 
@@ -100,36 +100,36 @@ cd ..
 ```
 mkdir mPanPan1#M
 cd mPanPan1#M
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "mPanPan1#M*"
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "mPanPan1#M*filtered10Mb.maf.gz"
 cd ..
 
 mkdir mPanPan1#P
 cd mPanPan1#P
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/mPanPan1#P#chrY_pat_hsaY.maf.gz .
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/mPanPan1#P#chrY_pat_hsaY.filtered10Mb.maf.gz .
 cd ..
 ```
 
 
 ```
-mkdir mGorGor1#P
-cd mGorGor1#P
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "mGorGor1#P*"
-cd ..
-
 mkdir mGorGor1#M
 cd mGorGor1#M
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/mGorGor1#M#chrX_mat_hsaX.maf.gz .
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "mGorGor1#M*filtered10Mb.maf.gz"
+cd ..
+
+mkdir mGorGor1#P
+cd mGorGor1#P
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/mGorGor1#P#chrY_pat_hsaY.filtered10Mb.maf.gz .
 cd ..
 ```
 
 ```
 mkdir mPonAbe1#1
 cd mPonAbe1#1
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "mPonAbe1#1*"
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "mPonAbe1#1*filtered10Mb.maf.gz"
 cd ..
 
 mkdir mPonAbe1#2
 cd mPonAbe1#2
-aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/mPonAbe1#2#chrY_hap2_hsaY.maf.gz .
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/mPonAbe1#2#chrY_hap2_hsaY.filtered10Mb.maf.gz .
 cd ..
 ```
