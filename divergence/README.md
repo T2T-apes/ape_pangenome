@@ -31,3 +31,5 @@ Density plots are broken down according to whether the segments come from an aut
 
 This plot is the same as the plot above but zoomed in.
 ![Gap divergence](basic-div/gap_divergence_zoomed.png)
+
+IMPORTANT: An issue in making histograms or density plots for the Y chromosome is that there are far fewer segments than for autosomes (~30 vs ~3000 segments for autosomes). Thus, peaks could be driven by 1-2 segments for the Y chromosome.
