@@ -22,7 +22,7 @@ SNV divergence and gap divergence were computed from pairwise alignments, estima
 The plot below shows 1MB segments are binned by **SNV divergence** separated by pairwise alignment (note that density, rather than counts, are shown).
 The second haplotype listed was aligned to the first (note that "x vs. y" and "y vs. x" are different pairwise alignments because the former includes the entire x haplotype with no gaps and the latter includes the entire y haplotype with no gaps).
 Density plots are broken down according to whether the segments come from an autosome, the X chromosome, or the Y chromosome. Mean SNV divergence is reported for these three cases (numeric values and circles; medians are `|` characters).
-![SNV divergence](basic-div/snp_divergence.png)
+![SNV divergence](basic-div/snv_divergence.png)
 
 The plot below shows 1MB segments are binned by **gap divergence** separated by pairwise alignment (note that density, rather than counts, are shown; height normalizd hisograms are also shown). 
 The second haplotype listed was aligned to the first (note that "x vs. y" and "y vs. x" are different pairwise alignments because the former includes the entire x haplotype with no gaps and the latter includes the entire y haplotype with no gaps).
