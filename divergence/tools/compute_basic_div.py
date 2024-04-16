@@ -116,7 +116,7 @@ def run_same_species(mafpath, base, hap1, hap2, maxchr):
     output = "basic-div-" + base + "-" + hap1 + "-vs-" + hap2 + "-autosomes.csv"
     with open(output, 'w') as fout:
         fout.write("NAME_REF,NAME_OTHER,CHR,BIN_START,BIN_END,BIN_SIZE,GAP_BOTH,GAP_REF,GAP_OTHER,DIFF,SAME\n")
-        for xchr in range(22, maxchr + 1):
+        for xchr in range(1, maxchr + 1):
             command = "ls " + mafpath + "/" + base + "/" + base + "#chr" + str(xchr) + "_*.filtered10Mb.maf.gz"
             maf = subprocess.check_output(command, shell=True, text=True)
             maf = maf.strip()
