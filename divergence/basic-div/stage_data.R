@@ -49,7 +49,7 @@ df8x <- read.csv("basic-div-hg002#M-hg002#M-vs-mPanPan1#M-X.csv",
 df8y <- read.csv("basic-div-hg002#P-hg002#P-vs-mPanPan1#P-Y.csv",
                  header=TRUE, row.names=NULL, sep=',')
 df8 = rbind(df8a, df8x, df8y)
-df8$NAME = "hg002 vs. mPanPan1"
+df8$NAME = "hg002 vs. PanPan1"
 
 # Bonobo vs. Human
 df9a <- read.csv("basic-div-mPanPan1#M-mPanPan1#M-vs-hg002#M-autosomes.csv",
@@ -89,7 +89,7 @@ df12x <- read.csv("basic-div-hg002#M-hg002#M-vs-mPonAbe1#1-X.csv",
 df12y <- read.csv("basic-div-hg002#P-hg002#P-vs-mPonAbe1#2-Y.csv",
                  header=TRUE, row.names=NULL, sep=',')
 df12 = rbind(df12a, df12x, df12y)
-df12$NAME = "hg002 vs. mPonAbe1"
+df12$NAME = "hg002 vs. PonAbe1"
 
 # Orang vs. Human
 df13a <- read.csv("basic-div-mPonAbe1#1-mPonAbe1#1-vs-hg002#M-autosomes.csv",
@@ -109,8 +109,8 @@ df$CHRGRP[df$CHR == "Y"] <- "Y"
 
 names <- c("hg002", "PanTro3", "PanPan1", "GorGor1", "PonAbe1",
            "hg002 vs. PanTro3", "PanTro3 vs. hg002",
-           "hg002 vs. mPanPan1", "PanPan1 vs. hg002",
+           "hg002 vs. PanPan1", "PanPan1 vs. hg002",
            "hg002 vs. GorGor1", "GorGor1 vs. hg002",
-           "hg002 vs. mPonAbe1", "PonAbe1 vs. hg002")
+           "hg002 vs. PonAbe1", "PonAbe1 vs. hg002")
 df$NAME <- factor(df$NAME, levels=names)
 

@@ -1,13 +1,14 @@
 library(tidyverse)
 library(ggridges)
 library(ggplot2)
+library(dplyr)
 
 source("stage_data.R")
 
 # Plot A -- Look at SNP divergence
 p <-  ggplot(df, aes(x=DIFF, y=NAME, color=CHRGRP, fill=CHRGRP))
-p <- p + geom_density_ridges(scale=1.0)
-#p <- p + geom_density_ridges(stat="binline", bins=50, scale=1.0)
+p <- p + geom_density_ridges(scale=0.85)
+#p <- p + geom_density_ridges(scale=0.85, stat="binline", bins=100)
 
 #p <- ggplot(df)
 #p <- p + geom_density_ridges(
@@ -28,32 +29,50 @@ p <- p + theme_classic()
 p <- p + theme(legend.title=element_blank())
 
 
+meanpts <- c()
+meanys <- c()
+meanxs <- c()
+
+medianpts <- c()
+medianys <- c()
+medianxs <- c()
+
 xs <- c()
 ys <- c()
 cs <- c()
 labs <- c()
 base <- 1
 for (name in names) {
+    xdf <- df[df$NAME == name, ]
     shift <- base + 0.2
     for (chrgrp in c("Y", "X", "A")) {
+        ydf <- xdf[xdf$CHRGRP == chrgrp, ]
+
         # Update xs
         xs <- append(xs, 0.25)
 
         # Update ys
         ys <- append(ys, shift)
         shift <- shift + 0.3
+        meanys <- append(meanys, base)
+        medianys <- append(medianys, base)
 
         cs <- append(cs, chrgrp)
 
-        # Update mean labels
-        xdf <- df[df$NAME == name, ]
-        ydf <- xdf[xdf$CHRGRP == chrgrp, ]
+        # Update mean and median markers
         mymean <- mean(ydf$DIFF,  na.rm=TRUE)
-        #mymean <- median(ydf$GAP_OTHER,  na.rm=TRUE)
+        mymedian <- median(ydf$DIFF,  na.rm=TRUE)
+
+        meanxs <- append(meanxs, mymean)
+        medianxs <- append(medianxs, mymedian)
         if (is.nan(mymean)) {
             labs <- append(labs, "")
+            meanpts <- append(meanpts, "")
+            medianpts <- append(medianpts, "")
         } else {
             labs <- append(labs, sprintf("%f", mymean))
+            meanpts <- append(meanpts, "o")
+            medianpts <- append(medianpts, "|")
         }
     }
     base <- base + 1
@@ -66,10 +85,28 @@ annotation <- data.frame(
    CHRGRP = cs
 )
 
-p <- p + geom_text(data=annotation, aes(x=x, y=y, label=label), size=2.5, fontface="bold") #,                 , 
-           #color="orange", 
-           #size=7 , angle=45, fontface="bold" )
+meandf <- data.frame(
+   y = meanys,
+   x = meanxs,
+   label = meanpts,
+   CHRGRP = cs
+)
+
+mediandf <- data.frame(
+   y = medianys,
+   x = medianxs,
+   label = medianpts,
+   CHRGRP = cs
+)
+
+p <- p + geom_text(data=meandf, aes(x=x, y=y, label=label), size=2.5, fontface="bold")
+
+p <- p + geom_text(data=mediandf, aes(x=x, y=y, label=label), size=2.5, fontface="bold")
+
+p <- p + geom_text(data=annotation, aes(x=x, y=y, label=label), size=2.5, fontface="bold") 
+
+p <- p + xlim(0.0, 0.3)
 
 
 print(p)
-ggsave("snp_divergence.png", dpi=300)
+ggsave("snv_divergence.png", dpi=300)
