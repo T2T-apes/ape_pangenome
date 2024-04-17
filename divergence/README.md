@@ -34,8 +34,11 @@ This plot is the same as the plot above but zoomed in.
 
 IMPORTANT: An issue in making histograms or density plots for the Y chromosome is that there are far fewer segments than for autosomes (~30 vs ~3000 segments for autosomes). Thus, peaks could be driven by 1-2 segments for the Y chromosome.
 
-Note that you can count the number of missing characters in the reference file in the pairwise alignment with this command. You can also check the CSV files for more information.
+Note that you can count the number of missing characters in the first haplotype in the pairwise alignment with this command. You can also check the CSV files for more information.
+As an example:
 ```
-zcat <filname>.maf.gz | head -n2 > tmp.txt
+zcat mafs/hg002#M/hg002#M#chr22_MATERNAL.filtered10Mb.maf.gz | head -n2 | tail -n1 | awk '{print $7}' > tmp.txt
+wc -c tmp.txt
 tr -cd 'N' < tmp.txt | wc -c
 ```
+shows that 5345761 out of 53395393 characters (10%) are `N`.
