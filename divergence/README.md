@@ -18,10 +18,10 @@ Rscript plot_snv_divergence.R
 ```
 
 **RESULTS:** 
-We computed SNV and gap divergence from each pairwise alignment, estimated with wfmash v 0.13, for 1MB segments running across the target haplotype. We then binned segments based on divergence (see density plots below), reporting the mean and median segment divergence. **SNV divergence** was defined as the fraction of positions in the target haplotype where the two haplotypes were in different *nucleotide* states. **Gap divergence** was defined as the fraction of positions in the target haplotype that were not aligned to the other haplotype, which could be due to biological processes (e.g., gene loss/gain and insertions/deletions), missing data, or technical problems (e.g. alignment failure).
+We computed SNV and gap divergence from each pairwise alignment, estimated with wfmash v 0.13, for 1MB segments running across the target haplotype. We then binned segments based on divergence (see density plots below), reporting the mean and median segment divergence. **SNV divergence** is defined as the fraction of positions in the target haplotype where the two haplotypes are in different *nucleotide* states. **Gap divergence** is defined as the fraction of positions in the target haplotype that are not aligned to the other haplotype, which could be due to biological processes (e.g., gene loss/gain and insertions/deletions), missing data, or technical problems (e.g. alignment failure).
 
 The plot below shows 1MB segments binned by **SNV divergence** for each pairwise alignment (note that density, rather than counts, are shown).
-The second haplotype listed was aligned to the first/target haplotype (note that "A vs. B" and "A vs. B" are different pairwise alignments because the former includes the entire A haplotype with no gaps and the latter includes the entire B haplotype with no gaps).
+The second haplotype listed was aligned to the first/target haplotype (note that "A vs. B" and "B vs. A" are different pairwise alignments because the former includes the entire A haplotype with no gaps and the latter includes the entire B haplotype with no gaps).
 Density plots are broken down according to whether the segments come from an autosome, the X chromosome, or the Y chromosome. Mean SNV divergence is reported for these three cases (numeric values and circles; medians are `|` characters).
 ![SNV divergence](basic-div/snv_divergence.png)
 
