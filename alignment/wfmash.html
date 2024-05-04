@@ -3,8 +3,22 @@ This set of tracks provides per base alignment for all T2T primate assemblies by
 
 <h2>Methods</h2>
 <ul>
-    <li>We applied <a href="https://github.com/waveygang/wfmash">WFMASH</a> to align all assemblies against all T2T primate assemblies using each one as reference. We filtered out alignments shorter than 50kbp and/or with identity lower than ~70%.</li>
-    <li>We used <a href="https://github.com/AndreaGuarracino/paf2chain">PAF2CHAIN</a> to convert aligned PAF files to CHAIN files.</li>
+    <li>We applied <a href="https://github.com/waveygang/wfmash">WFMASH</a> to align all assemblies against all T2T primate assemblies using each one as reference (target). We filtered out alignments shorter than 25kbp and with identity lower than ~70%.
+        <br/>
+        <br/>
+        <code>
+            wfmash -t 48 -P "$TARGET#" --one-to-one -Y "#" -n 1 -p 70 -s 5k -c 20k primates16.20231205.fa.gz > $TARGET.p70.aln.paf
+        </code>
+    </li>
+    <br/>
+    <li>
+        We used <a href="https://github.com/AndreaGuarracino/paf2chain">PAF2CHAIN</a> to convert aligned PAF files to CHAIN files.
+        <br/>
+        <br/>
+        <code>
+            paf2chain -i $TARGET.p70.aln.paf -o $TARGET.p70.aln.chain
+        </code>
+    </li>
 </ul>
 
 For a full description of the methods, refer to the <a href="https://github.com/T2T-apes/ape_pangenome">ape_pangenome</a> repository.
