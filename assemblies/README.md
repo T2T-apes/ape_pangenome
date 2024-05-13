@@ -26,15 +26,29 @@ for species in mGorGor1 mPanPan1; do
         bgzip -@ 48 -l 9 > $species.fa.gz && samtools faidx $species.fa.gz
 done
 for species in mPanTro3 mPonPyg2; do
-    zcat $species.dip.cur.20231122.fasta.gz  | \
+    zcat $species.dip.cur.20231122.fasta.gz | \
         sed "/^>/ s/chr\(.*\)_\(hap1\|hap2\)_*/$species##\2##\0/; s/#hap1#/1/; s/#hap2#/2/" | \
         bgzip -@ 48 -l 9 > $species.fa.gz && samtools faidx $species.fa.gz
 done
-for species in mPonAbe1 mSymSyn1; do
-    zcat $species.dip.cur.20231205.fasta.gz  | \
+for species in mPonAbe1; do
+    zcat $species.dip.cur.20231205.fasta.gz | \
         sed "/^>/ s/chr\(.*\)_\(hap1\|hap2\)_*/$species##\2##\0/; s/#hap1#/1/; s/#hap2#/2/" | \
         bgzip -@ 48 -l 9 > $species.fa.gz && samtools faidx $species.fa.gz
 done
+
+# Swap chr12 <--> chr19 as they were wrongly assigned
+zcat mSymSyn1.dip.cur.20231205.fasta.gz | \
+    sed "/^>/ {
+       s/chr12_hap1/chrXX_hap1/;
+       s/chr19_hap1/chr12_hap1/;
+       s/chrXX_hap1/chr19_hap1/;
+       s/chr12_hap2/chrXX_hap2/;
+       s/chr19_hap2/chr12_hap2/;
+       s/chrXX_hap2/chr19_hap2/;
+     }" | \
+    sed "/^>/ s/chr\(.*\)_\(hap1\|hap2\)_*/mSymSyn1##\2##\0/; s/#hap1#/1/; s/#hap2#/2/" | \
+    bgzip -@ 48 -l 9 > mSymSyn1.fa.gz && samtools faidx mSymSyn1.fa.gz
+
 rm *fasta.gz
 
 zcat hg002v1.0.1.fasta | sed -e 's/^>chr\(.*\)_MATERNAL/>hg002#M#chr\1_MATERNAL/' \
@@ -47,8 +61,7 @@ rm hg002v1.0.1.fasta.gz
 Put all haplotypes together (assumes you already have PanSN-ed CHM13v2 and PanSN-ed GRCh38):
 
 ```shell
-zcat chm13v2.0.fa.gz grch38.fa.gz hg002v101.fa.gz mGorGor1.fa.gz mPanPan1.fa.gz mPanTro3.fa.gz mPonAbe1.fa.gz mPonPyg2.fa.gz mSymSyn1.fa.gz | bgzip -@ 48 -l 9 > primates16.20231205.fa.gz
-samtools faidx primates16.20231205.fa.gz
+zcat chm13v2.0.fa.gz grch38.fa.gz hg002v101.fa.gz mGorGor1.fa.gz mPanPan1.fa.gz mPanTro3.fa.gz mPonAbe1.fa.gz mPonPyg2.fa.gz /lizardfs/guarracino/mSymSyn1.fa.gz | bgzip -@ 48 -l 9 > primates16.20240512.fa.gz && samtools faidx primates16.20240512.fa.gz
 ```
 
-You can find the final FASTA file at https://garrisonlab.s3.amazonaws.com/t2t-primates/primates16.20231205.fa.gz
+You can find the final FASTA file at https://garrisonlab.s3.amazonaws.com/t2t-primates/primates16.20240512.fa.gz

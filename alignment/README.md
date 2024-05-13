@@ -4,7 +4,7 @@ Set your paths:
 
 ```shell
 DIR_BASE=/path/to/primates
-PATH_PRIMATES16_FASTA=/path/to/primates16.20231205.fa.gz
+PATH_PRIMATES16_FASTA=/path/to/primates16.20240512.fa.gz
 WFMASH=/path/to/wfmash/build/bin/wfmash-d7b696087f634f25e4b3de7dd521e1c4bfa3cf0e # wfmash v0.13.0, commit d7b696087f634f25e4b3de7dd521e1c4bfa3cf0e
 PAF2CHAIN=/path/to/paf2chain/target/release/paf2chain
 ```
@@ -45,7 +45,7 @@ Upload on `garrisonlab` bucket:
 
 ```shell
 pigz -9
-ls *p70*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mapings/$f; done
+ls *p70*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mapings_fixedSiamang/$f; done
 ```
 
 ### Alignment
@@ -80,7 +80,7 @@ Upload on `garrisonlab` bucket:
 
 ```shell
 pigz -9
-ls *p70*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/alignments/$f; done
+ls *p70*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/alignments_fixedSiamang/$f; done
 ```
 
 ### Chains
@@ -100,7 +100,7 @@ done
 Upload on `garrisonlab` bucket:
 
 ```shell
-ls *p70*.chain.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/chains/$f; done
+ls *p70*.chain.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/chains_fixedSiamang/$f; done
 ```
 
 ## HPRCy1-vs-primates
@@ -108,7 +108,7 @@ ls *p70*.chain.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-
 Prepare:
 
 ```shell
-cat /lizardfs/erikg/HPRC/year1v2genbank/assemblies/*v2_genbank.fa <(zcat /lizardfs/erikg/HPRC/year1v2genbank/assemblies/HG02080.paternal.f1_assembly_v2_genbank.fa.gz) <(zcat /lizardfs/guarracino/pggb-paper/assemblies/primates/primates16.20231205.fa.gz) | bgzip -l 9 -@ 128 > /lizardfs/guarracino/HPRC/HPRCy1+primates16.fa.gz && samtools faidx /lizardfs/guarracino/HPRC/HPRCy1+primates16.fa.gz
+cat /lizardfs/erikg/HPRC/year1v2genbank/assemblies/*v2_genbank.fa <(zcat /lizardfs/erikg/HPRC/year1v2genbank/assemblies/HG02080.paternal.f1_assembly_v2_genbank.fa.gz) <(zcat /lizardfs/guarracino/pggb-paper/assemblies/primates/primates16.20240512.fa.gz) | bgzip -l 9 -@ 128 > /lizardfs/guarracino/HPRC/HPRCy1+primates16.fa.gz && samtools faidx /lizardfs/guarracino/HPRC/HPRCy1+primates16.fa.gz
 ```
 
 ### Mapping
@@ -142,7 +142,7 @@ Upload on `garrisonlab` bucket:
 
 ```shell
 pigz -9 *paf
-ls HPRCy1-vs-*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mappings/$f; done
+ls HPRCy1-vs-*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mappings_fixedSiamang/$f; done
 ```
 
 ### Alignment
@@ -176,7 +176,7 @@ Upload on `garrisonlab` bucket:
 
 ```shell
 pigz -9 *paf
-ls HPRCy1-vs-*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/alignments/$f; done
+ls HPRCy1-vs-*.paf.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/alignments_fixedSiamang/$f; done
 ```
 
 ### Chains
@@ -194,12 +194,13 @@ done
 Upload on `garrisonlab` bucket:
 
 ```shell
-ls HPRCy1-vs-*.chain.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/chains/$f; done
+ls HPRCy1-vs-*.chain.gz | while read f; do echo $f; aws s3 cp $f s3://garrisonlab/t2t-primates/wfmash-v0.13.0/chains_fixedSiamang/$f; done
 ```
 
 ## Results
 
 You can find:
-- the mapping PAF files at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/mappings/
-- the aligned PAF files at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/alignments/ 
-- the CHAIN files at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/chains/ 
+- the mapping PAF files at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/mappings_fixedSiamang/
+- the aligned PAF files at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/alignments_fixedSiamang/ 
+- the CHAIN files at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/chains_fixedSiamang/ 
+- the MAF files at https://garrisonlab.s3.amazonaws.com/index.html?prefix=t2t-primates/wfmash-v0.13.0/mafs_fixedSiamang/ 
