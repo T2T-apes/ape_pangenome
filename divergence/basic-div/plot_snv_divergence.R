@@ -8,7 +8,7 @@ source("stage_data.R")
 # Plot A -- Look at SNP divergence
 p <-  ggplot(df, aes(x=DIFF, y=NAME, color=CHRGRP, fill=CHRGRP))
 p <- p + geom_density_ridges(scale=0.85)
-#p <- p + geom_density_ridges(scale=0.85, stat="binline", bins=100)
+p <- p + geom_density_ridges(scale=0.85, stat="binline", bins=100)
 
 #p <- ggplot(df)
 #p <- p + geom_density_ridges(
@@ -99,9 +99,9 @@ mediandf <- data.frame(
    CHRGRP = cs
 )
 
-p <- p + geom_text(data=meandf, aes(x=x, y=y, label=label), size=2.5, fontface="bold")
+#p <- p + geom_text(data=meandf, aes(x=x, y=y, label=label), size=2.5, fontface="bold")
 
-p <- p + geom_text(data=mediandf, aes(x=x, y=y, label=label), size=2.5, fontface="bold")
+#p <- p + geom_text(data=mediandf, aes(x=x, y=y, label=label), size=2.5, fontface="bold")
 
 p <- p + geom_text(data=annotation, aes(x=x, y=y, label=label), size=2.5, fontface="bold") 
 
@@ -109,4 +109,4 @@ p <- p + xlim(0.0, 0.3)
 
 
 print(p)
-ggsave("snv_divergence.png", dpi=300)
+ggsave("snv_divergence-v2.png", dpi=300)
