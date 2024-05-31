@@ -109,4 +109,4 @@ p <- p + xlim(0.0, 0.3)
 
 
 print(p)
-ggsave("snv_divergence-v2.png", dpi=300)
+ggsave("snv_divergence.png", dpi=300)
