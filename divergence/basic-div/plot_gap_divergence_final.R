@@ -115,6 +115,11 @@ annotation <- data.frame(
    CHRGRP = cs
 )
 
+print(xs)
+#  0.90   0.75 0.60
+# 0.225 0.1875 0.15
+# 0.0375 vs. 0.0375
+
 meandf <- data.frame(
    y = meanys,
    x = meanxs,
@@ -165,7 +170,6 @@ testdf <- data.frame(
    CHRGRP = c("A", "A", "A", "A")
 )
 
-p <- p + geom_vline(xintercept=5,linetype=3)
 p <- p + geom_text(data=testdf, aes(x=x, y=y, label=label), color="#000000", size=2.75, fontface="bold")
 p <- p + geom_text(data=testdf, aes(x=0.475, y=4.4, label="intra:"), color="#000000", size=2.75, fontface="bold")
 p <- p + geom_text(data=testdf, aes(x=0.475, y=4.65, label="inter:"), color="#000000", size=2.75, fontface="bold")
@@ -208,5 +212,5 @@ p <- p + geom_segment(aes(x=intrameans[4],
 print(p)
 
 p <- p + xlim(0.0, 1.0)
-ggsave("gap_divergence-final.pdf", width=6, height=3.5, dpi=300)
-
+#ggsave("gap_divergence-final.pdf", width=6, height=3.5, dpi=300)
+ggsave("gap_divergence-final.png", width=6, height=3.5, dpi=300)

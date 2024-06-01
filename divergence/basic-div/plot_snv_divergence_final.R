@@ -165,7 +165,6 @@ testdf <- data.frame(
    CHRGRP = c("A", "A", "A", "A")
 )
 
-p <- p + geom_vline(xintercept=5,linetype=3)
 p <- p + geom_text(data=testdf, aes(x=x, y=y, label=label), color="#000000", size=2.75, fontface="bold")
 p <- p + geom_text(data=testdf, aes(x=0.11875, y=4.4, label="intra:"), color="#000000", size=2.75, fontface="bold")
 p <- p + geom_text(data=testdf, aes(x=0.11875, y=4.65, label="inter:"), color="#000000", size=2.75, fontface="bold")
@@ -208,5 +207,6 @@ p <- p + geom_segment(aes(x=intrameans[4],
 print(p)
 
 p <- p + xlim(0.0, 0.25)
-ggsave("snv_divergence-final.pdf", width=6, height=3.5, dpi=300)
+#ggsave("snv_divergence-final.pdf", width=6, height=3.5, dpi=300)
+ggsave("snv_divergence-final.png", width=6, height=3.5, dpi=300)
 
