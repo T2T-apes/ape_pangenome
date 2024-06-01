@@ -146,13 +146,18 @@ for (name in levels(inter_df$NAME)) {
     mymean <- mean(ydf$GAP_OTHER,  na.rm=TRUE)
     intrameans <- append(intrameans, mymean)
     labs <- append(labs, sprintf("%1.3f (A)", round(round(mymean, 4), 3)))
-
-    print(ybase)
-
+    meanpts <- append(meanpts, "O")
     ybase <- ybase + 1
 }
 
-colors <- c("#000000", "#000000", "#000000", "#000000")
+#testdf <- data.frame(
+#   y = c(1, 2, 3, 4),
+#   x = intrameans,
+#   label = meanpts,
+#   CHRGRP = c("A", "A", "A", "A")
+#)
+#p <- p + geom_text(data=testdf, aes(x=x, y=y, label=label), size=2.75, fontface="bold", color="#000000")
+
 testdf <- data.frame(
    y = c(1.4, 2.4, 3.4, 4.4),
    x = c(0.6, 0.6, 0.6, 0.6),
@@ -166,7 +171,7 @@ p <- p + geom_text(data=testdf, aes(x=0.475, y=4.4, label="intra:"), color="#000
 p <- p + geom_text(data=testdf, aes(x=0.475, y=4.65, label="inter:"), color="#000000", size=2.75, fontface="bold")
 
 
-print(intrameans)
+#print(intrameans)
 p <- p + geom_segment(aes(x=intrameans[1], 
                           y=1,
                           xend=intrameans[1],
