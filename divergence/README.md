@@ -23,16 +23,16 @@ We computed SNV and gap divergence from each pairwise alignment, estimated with 
 The plot below shows 1MB segments binned by **SNV divergence** for each pairwise alignment (note that density, rather than counts, are shown).
 The second haplotype listed was aligned to the first/target haplotype (note that "A vs. B" and "B vs. A" are different pairwise alignments because the former includes the entire A haplotype with no gaps and the latter includes the entire B haplotype with no gaps).
 Density plots are broken down according to whether the segments come from an autosome, the X chromosome, or the Y chromosome. Mean SNV divergence is reported for these three cases (numeric values and circles; medians are `|` characters).
-![SNV divergence](basic-div/snv_divergence.png)
+![SNV divergence](basic-div/plots/snv_divergence.png)
 
 The plot below is the same as the snv divergence plot above but with histograms (along with density plots) and without mean/median markers.
-![Gap divergence](basic-div/snv_divergence-v2.png)
+![Gap divergence](basic-div/plots/snv_divergence-v2.png)
 
 The plot below shows 1MB segments are binned by **gap divergence** separated by pairwise alignment (note that density, rather than counts, are shown; height normalized hisograms are also shown).
-![Gap divergence](basic-div/gap_divergence.png)
+![Gap divergence](basic-div/plots/gap_divergence.png)
 
 The plot is the same as the gap divergence plot above but with histograms (along with density plots) and without mean/median markers.
-![Gap divergence](basic-div/gap_divergence-v2.png)
+![Gap divergence](basic-div/plots/gap_divergence-v2.png)
 
 IMPORTANT: An issue in making histograms or density plots for the Y chromosome is that there are far fewer segments than for autosomes (~30 vs ~3000 segments for autosomes). Thus, peaks could be driven by 1-2 segments for the Y chromosome.
 
