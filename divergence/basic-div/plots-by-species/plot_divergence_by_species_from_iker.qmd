@@ -1,0 +1,116 @@
+---
+title: "Plot divergence by species"
+format: html
+editor: source
+---
+
+```{r}
+# from Iker Rivas-Gonzalez
+
+library(tidyverse)
+library(ggridges)
+library(ggplot2)
+
+
+inter_df <- read.csv("interspecies_divergence.csv")
+intra_df <- read.csv("intraspecies_divergence.csv")
+
+
+inter_df$NAME <- factor(inter_df$NAME)
+print(levels(inter_df$NAME))
+
+inter_df$NAME <- factor(inter_df$NAME, 
+	                    levels = c("PAB_GAP", "PAB_SNV", 
+	                    		   "GGO_GAP", "GGO_SNV", 
+	                    	       "PTR_GAP", "PTR_SNV", 
+	                    	       "PPA_GAP", "PPA_SNV"))
+
+
+p <- 
+  inter_df |>
+  ggplot(aes(x=DIV, y=NAME, color=CHRGRP, fill=CHRGRP)) +
+  geom_density_ridges(scale=0.9, na.rm=TRUE) +
+  scale_y_discrete(expand = c(0, 0)) +
+  labs(x = "", y = "", colour = "", title = "", subtitle = "") +
+  scale_fill_manual(values = c( "#673AB750", "#D55E0050", "#0072B250"), labels = c("autosomes", "X", "Y")) +
+  scale_color_manual(values = c("#673AB7",   "#D55E00",   "#0072B2"), guide = "none") +
+  coord_cartesian(clip = "off") +
+  theme_classic() + 
+  theme(legend.title=element_blank())
+
+# p <- p + xlim(0.0, 0.25)
+
+
+```
+
+```{r}
+
+# Original plot
+p
+
+p + xlim(0.0, 0.25)
+
+```
+
+
+```{r}
+
+p2 <- inter_df |> 
+  mutate(
+    NAME = factor(NAME, rev(c("PAB_GAP", "PAB_SNV", 
+	                    		   "GGO_GAP", "GGO_SNV", 
+	                    	       "PTR_GAP", "PTR_SNV", 
+	                    	       "PPA_GAP", "PPA_SNV")))
+  ) |> 
+  ggplot() +
+  geom_density(
+    aes(DIV, color=CHRGRP, fill=CHRGRP, group = CHRGRP),
+    alpha = 0.5, bw = 0.01) +
+  facet_grid(NAME~.) +
+  theme_classic() +
+  scale_color_manual(values = c("#673AB7",   "#D55E00",   "#0072B2")) +
+  scale_fill_manual(values = c("#673AB7",   "#D55E00",   "#0072B2")) +
+  theme(
+    strip.text.y = element_text(angle = 0),
+    legend.title = element_blank()
+  ) 
+
+```
+
+
+```{r}
+
+# Original data with no clipping
+p2
+
+# Y axis per row is allowed to vary
+p2 + facet_grid(NAME~., scales = "free") 
+
+```
+
+
+```{r}
+
+# Density is recalculated for the 0-0.25 range
+p3 <- p2 + xlim(c(0, 0.25))
+p3
+
+# Y axis per row is allowed to vary
+p3 + facet_grid(NAME~., scales = "free") 
+
+```
+
+```{r}
+
+# Density is calculated for the full range,
+# but the plot is clipped at 0.25. It's basically
+# like zooming in
+p4 <- p2 + coord_cartesian(xlim = c(0, 0.25))
+p4
+
+# Y axis per row is allowed to vary
+p4 + facet_grid(NAME~., scales = "free") 
+
+```
+
+
