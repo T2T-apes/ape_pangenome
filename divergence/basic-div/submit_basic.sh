@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for RUN in `seq 0 12`; do
+for RUN in `seq 0 19`; do
     echo "Processing $RUN"
     sbatch \
         --job-name="div.$RUN" \
