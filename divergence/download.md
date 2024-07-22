@@ -134,3 +134,14 @@ cd mPonAbe1#2
 aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/mPonAbe1#2#chrY_hap2_hsaY.filtered10Mb.maf.gz .
 cd ..
 ```
+```
+mkdir mPonPyg2#1
+cd mPonPyg2#1
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/ . --recursive  --exclude "*" --include "mPonPyg2#1*filtered10Mb.maf.gz"
+cd ..
+
+mkdir mPonPyg2#2
+cd mPonPyg2#2
+aws s3 cp s3://garrisonlab/t2t-primates/wfmash-v0.13.0/mafs/mPonPyg2#2#chrY_hap2_hsaY.filtered10Mb.maf.gz .
+cd ..
+```
