@@ -24,7 +24,8 @@ NAMES=( "chm13#1" \
         "mPanTro3#1" "mPanTro3#2" \
         "mPanPan1#M" "mPanPan1#P" \
         "mGorGor1#M" "mGorGor1#P" \
-        "mPonAbe1#1" "mPonAbe1#2" )
+        "mPonAbe1#1" "mPonAbe1#2" \
+        "mPonPyg2#1" "mPonPyg2#2" )
 ```
 
 Download alignments (PAFs).
