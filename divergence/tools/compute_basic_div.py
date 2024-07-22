@@ -172,37 +172,45 @@ def main(args):
     mafpath = args.mafpath
     runset = set(args.runlist)
 
-    # Process hg002M vs. hg002P (through hg002M; can't include X or Y)
+    # Process Human - hg002M vs. hg002P through hg002M; can't include X or Y
     if 0 in runset:
         run_same_species(mafpath, "hg002#M", "hg002#M", "hg002#P", 22)
 
-    # Process mPanTro3#1 vs. mPanTro3#2 (through mPanTro3#1; can't include X or Y)
+    # Process Chimp - mPanTro3#1 vs. mPanTro3#2 through mPanTro3#1; can't include X or Y
     if 1 in runset:
         run_same_species(mafpath, "mPanTro3#1", "mPanTro3#1", "mPanTro3#2", 23)
 
-    # Process mPanPan1#M vs. mPanPan1#P (through mPanTro3#1; can't include X or Y)
+    # Process Bonobo - mPanPan1#M vs. mPanPan1#P through mPanPan1#M; can't include X or Y
     if 2 in runset:
         run_same_species(mafpath, "mPanPan1#M", "mPanPan1#M", "mPanPan1#P", 23)
 
-    # Process mGorGor1#M vs. mGorGor1#P (through mPanTro3#1; can't include X or Y)
+    # Process Gorilla - mGorGor1#M vs. mGorGor1#P through mGorGor1#M; can't include X or Y
     if 3 in runset:
         run_same_species(mafpath, "mGorGor1#M", "mGorGor1#M", "mGorGor1#P", 23)
 
-    # Process mPonAbe1#1 vs. mPonAbe1#2 (through mPonAbe1#1; can't include X or Y)
+    # Process S. Orang - mPonAbe1#1 vs. mPonAbe1#2 through mPonAbe1#1; can't include X or Y
     if 4 in runset:
         run_same_species(mafpath, "mPonAbe1#1", "mPonAbe1#1", "mPonAbe1#2", 23)
 
-    nextrun = 5
-    mhaps = ["mPanTro3#1", "mPanPan1#M", "mGorGor1#M", "mPonAbe1#1"]
-    phaps = ["mPanTro3#2", "mPanPan1#P", "mGorGor1#P", "mPonAbe1#2"]
+    # Process B. Orang - mPonPyg2#1 vs. mPonPyg2#2 through mPonPyg2#1; can't include X or Y
+    if 5 in runset:
+        run_same_species(mafpath, "mPonPyg2#1", "mPonPyg2#1", "mPonPyg2#2", 23)
+
+    # Human vs. Ape and vice versa
+    nextrun = 6
+    mhaps = ["mPanTro3#1", "mPanPan1#M", "mGorGor1#M", "mPonAbe1#1", "mPonPyg2#1"]
+    phaps = ["mPanTro3#2", "mPanPan1#P", "mGorGor1#P", "mPonAbe1#2", "mPonPyg2#2"]
 
     for mhap, phap in zip(mhaps, phaps):
+
+        # Process Human vs. Ape - 6, 8, 10, 12, 14
         if nextrun in runset:
             run_diff_species(mafpath, "hg002#M", "hg002#M", mhap, 22)
             run_diff_species_X(mafpath, "hg002#M", "hg002#M", mhap, 22)
             run_diff_species_Y(mafpath, "hg002#P", "hg002#P", phap, 22)
         nextrun += 1
 
+        # Process Ape vs. Human - 7, 9, 11, 13, 15
         if nextrun in runset:
             run_diff_species(mafpath, mhap, mhap, "hg002#M", 23)
             run_diff_species_X(mafpath, mhap, mhap, "hg002#M", 23)
@@ -210,9 +218,31 @@ def main(args):
 
         nextrun += 1
 
+    # Process S. Orang (mPonAbe1#1) vs. B. Orang (mPonPyg2#1) through S. Orang (mPonAbe1#1)
+    if 16 in runset:
+        run_diff_species(mafpath, "mPonAbe1#1", "mPonAbe1#1", "mPonPyg2#1", 23)
+        run_diff_species_X(mafpath, "mPonAbe1#1", "mPonAbe1#1", "mPonPyg2#1", 23)
+        run_diff_species_Y(mafpath, "mPonAbe1#2", "mPonAbe1#2", "mPonPyg2#2", 23)
+
+    # Process B. Orang (mPonPyg2#1) vs. S. Orang (mPonAbe1#1) vs. through B. Orang (mPonPyg2#1)
+    if 17 in runset:
+        run_diff_species(mafpath, "mPonPyg2#1", "mPonPyg2#1", "mPonAbe1#1", 23)
+        run_diff_species_X(mafpath, "mPonPyg2#1", "mPonPyg2#1", "mPonAbe1#1", 23)
+        run_diff_species_Y(mafpath, "mPonPyg2#2", "mPonPyg2#2", "mPonAbe1#2", 23)
+
+    # Chimp (mPanTro3#1) vs. Bonobo (mPanPan1#M) through Chimp (mPanTro3#1)
+    if 18 in runset:
+        run_diff_species(mafpath, "mPanTro3#1", "mPanTro3#1", "mPanPan1#M", 23)
+        run_diff_species_X(mafpath, "mPanTro3#1", "mPanTro3#1", "mPanPan1#M", 23)
+        run_diff_species_Y(mafpath, "mPanTro3#2", "mPanTro3#2", "mPanPan1#P", 23)
+
+    # Bonobo (mPanPan1#M) vs. Chimp (mPanTro3#1) through Bonobo (mPanPan1#M)
+    if 19 in runset:
+        run_diff_species(mafpath, "mPanPan1#M", "mPanPan1#M", "mPanTro3#1", 23)
+        run_diff_species_X(mafpath, "mPanPan1#M",  "mPanPan1#M", "mPanTro3#1", 23)
+        run_diff_species_Y(mafpath, "mPanPan1#P", "mPanPan1#P", "mPanTro3#2", 23)
 
 # module load Python3/3.10.10
-
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
