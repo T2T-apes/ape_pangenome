@@ -190,7 +190,14 @@ names <- c("hg002", "PanTro3", "PanPan1", "GorGor1", "PonAbe1", "mPonPyg2",
 df$NAME <- factor(df$NAME, levels=names)
 
 # Now table stuff
-keep <- df %>%
+#keep <- df %>%
+#        group_by(NAME, CHRGRP, .add = TRUE) %>%
+#        summarise_at(vars(GAP_OTHER, DIFF), funs(mean(., na.rm=TRUE)))
+#write.csv(keep,"mean_summary.csv", row.names = FALSE
+
+df2 <- df <- df[df$BIN_SIZE == 1000000, ]
+#print(df2)
+keep <- df2 %>%
         group_by(NAME, CHRGRP, .add = TRUE) %>%
         summarise_at(vars(GAP_OTHER, DIFF), funs(mean(., na.rm=TRUE)))
-write.csv(keep,"mean_summary.csv", row.names = FALSE)
+write.csv(keep,"mean_summary-restrict-1MB.csv", row.names = FALSE)
