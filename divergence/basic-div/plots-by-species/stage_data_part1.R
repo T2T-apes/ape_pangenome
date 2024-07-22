@@ -178,7 +178,7 @@ df$CHRGRP <- "A"
 df$CHRGRP[df$CHR == "X"] <- "X"
 df$CHRGRP[df$CHR == "Y"] <- "Y"
 
-names <- c("hg002", "PanTro3", "PanPan1", "GorGor1", "PonAbe1", "mPonPyg2",
+names <- c("hg002", "PanTro3", "PanPan1", "GorGor1", "PonAbe1", "PonPyg2",
            "hg002 vs. PanTro3", "PanTro3 vs. hg002",
            "hg002 vs. PanPan1", "PanPan1 vs. hg002",
            "hg002 vs. GorGor1", "GorGor1 vs. hg002",
@@ -193,7 +193,7 @@ df$NAME <- factor(df$NAME, levels=names)
 #keep <- df %>%
 #        group_by(NAME, CHRGRP, .add = TRUE) %>%
 #        summarise_at(vars(GAP_OTHER, DIFF), funs(mean(., na.rm=TRUE)))
-#write.csv(keep,"mean_summary.csv", row.names = FALSE
+#write.csv(keep,"mean_summary.csv", row.names = FALSE)
 
 #df2 <- df <- df[df$BIN_SIZE == 1000000, ]
 #keep <- df2 %>%
