@@ -192,11 +192,17 @@ ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | while read MAF; do
     DIR_OUTPUT=$DIR_BASE/conservation/approach2/$NAME.filter10Mb/$CHR
     mkdir -p $DIR_OUTPUT
     cd $DIR_OUTPUT
-    zgrep "^$CHR" -w $DIR_BASE/data/chm13v2.0_RefSeq_Liftoff_v5.1.gff3.gz | grep 'exon' | sed "s/$CHR/Homo_sapiens/g" > $DIR_OUTPUT/$CHR.chm13.exon.gff
-    sort -k1,1 -k4,4n $DIR_OUTPUT/$CHR.chm13.exon.gff | bedtools merge > $DIR_OUTPUT/$CHR.chm13.exon.bed
 
-    # chr2 has a too big MAF file, we need to process it differently'
-    if [[ "$CHR" == "chr2" ]]; then
+    # With exons
+    #zgrep "^$CHR" -w $DIR_BASE/data/chm13v2.0_RefSeq_Liftoff_v5.1.gff3.gz | grep 'exon' | sed "s/$CHR/Homo_sapiens/g" > $DIR_OUTPUT/$CHR.chm13.exon.gff
+    # With CDSs
+    zgrep "^$CHR" -w $DIR_BASE/data/chm13v2.0_RefSeq_Liftoff_v5.1.gff3.gz | awk '$3 == "CDS"' | sed "s/$CHR/Homo_sapiens/g" > $DIR_OUTPUT/$CHR.chm13.cds.gff
+
+    sort -k1,1 -k4,4n $DIR_OUTPUT/$CHR.chm13.cds.gff | bedtools merge > $DIR_OUTPUT/$CHR.chm13.cds.bed
+
+    # With exons, chr2 leads to problems, so we need to process it differently
+    # With CDSs, chr2 and chr5 lead to problems, so we need to process it differently
+    if [[ "$CHR" == "chr2" || "$CHR" == "chr5" ]]; then
         # Chunk the MAF file in blocks 1 Mbp long
         $WGATOOLS chunk -l 1000000 $MAF -o xxx.maf
 
@@ -222,14 +228,14 @@ ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | while read MAF; do
             PREFIX=$(basename $MAF2 .maf)
             echo $MAF2 $PREFIX
             
-            $MSA_VIEW $MAF2 --in-format MAF --4d --features $DIR_OUTPUT/$CHR.chm13.exon.gff > $DIR_OUTPUT/$PREFIX.$CHR.4d-codons.ss
+            $MSA_VIEW $MAF2 --in-format MAF --4d --features $DIR_OUTPUT/$CHR.chm13.cds.gff > $DIR_OUTPUT/$PREFIX.$CHR.4d-codons.ss
             $MSA_VIEW $DIR_OUTPUT/$PREFIX.$CHR.4d-codons.ss --in-format SS --out-format SS --tuple-size 1 > $DIR_OUTPUT/$PREFIX.$CHR.4d-sites.ss
         done
         find . -type f -name "filtered_block*.$CHR.4d-sites.ss" -size 0 -exec rm {} + # To avoid errors for the aggregation because of empty files
         # https://github.com/CshlSiepelLab/phast/issues/10#issuecomment-387370910
         $MSA_VIEW --unordered-ss --out-format SS --aggregate Homo_sapiens,Pongo_abelii,Pan_troglodytes,Pan_paniscus,Symphalangus_syndactylus,Pongo_pygmaeus,Gorilla_gorilla filtered_block*.$CHR.4d-sites.ss > $CHR.4d-sites.ss
     else
-        $MSA_VIEW $MAF --in-format MAF --4d --features $DIR_OUTPUT/$CHR.chm13.exon.gff > $DIR_OUTPUT/$CHR.4d-codons.ss
+        $MSA_VIEW $MAF --in-format MAF --4d --features $DIR_OUTPUT/$CHR.chm13.cds.gff > $DIR_OUTPUT/$CHR.4d-codons.ss
         $MSA_VIEW $DIR_OUTPUT/$CHR.4d-codons.ss --in-format SS --out-format SS --tuple-size 1 > $DIR_OUTPUT/$CHR.4d-sites.ss
     fi
     $PHYLOFIT --tree $DIR_BASE/data/primate_tree.nwk --msa-format SS --out-root $DIR_OUTPUT/$CHR.4d $DIR_OUTPUT/$CHR.4d-sites.ss
@@ -251,7 +257,7 @@ Collect results:
     ls ELEMENTS/*bed |  while read BED; do
         len=$(basename $BED .bed | rev | cut -f 1 -d '.' | rev);
         tc=$(basename $BED .bed | rev | cut -f 2,3 -d '.' | rev);
-        bedtoolsJaccard=$(bedtools jaccard -a $CHR.chm13.exon.bed -b <(sed "s/chm13#1#$CHR/Homo_sapiens/g" $BED | awk '{print $1"\t"$2"\t"$3}') | tail -n1)
+        bedtoolsJaccard=$(bedtools jaccard -a $CHR.chm13.cds.bed -b <(sed "s/chm13#1#$CHR/Homo_sapiens/g" $BED | awk '{print $1"\t"$2"\t"$3}') | tail -n1)
         printf '%s\t' $len $tc ${bedtoolsJaccard[@]}
         printf '\n'
     done > $CHR.jaccards.tsv
@@ -289,7 +295,7 @@ done) | column -t
     # chrY   250    0.35  0.0461294
 ```
 
-Compute the chunks:
+Compute all outputs for the winning combinations:
 
 ```shell
 ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | sort -V | while read MAF; do
