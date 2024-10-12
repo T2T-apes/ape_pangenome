@@ -170,7 +170,7 @@ cd $DIR_BASE/data
 wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/T2T/CHM13/assemblies/annotation/chm13v2.0_RefSeq_Liftoff_v5.1.gff3.gz
 ```
 
-Grid-search:
+Prepare folder and combination to try:
 
 ```shell
 mkdir -p $DIR_BASE/conservation/approach2
@@ -180,7 +180,13 @@ lens=(1 $(seq 50 50 30000)) # The min. length can be 1
 for len in "${lens[@]}"; do 
     printf "${len}\n"
 done > combinations.txt
+```
 
+### Single chromosomes
+
+Grid search:
+
+```shell
 NAME=chm13#1.p70.aln
 
 ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | while read MAF; do
@@ -243,7 +249,7 @@ ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | while read MAF; do
     mkdir -p $DIR_OUTPUT/LOG
     mkdir -p $DIR_OUTPUT/ELEMENTS
     mkdir -p $DIR_OUTPUT/SCORES
-    sbatch --partition=tux -x tux06 --array=1-$(wc -l < $DIR_BASE/conservation/approach2/combinations.txt)%192 --cpus-per-task=1 --output=$DIR_OUTPUT/LOG/slurm-%A_%a.log $DIR_BASE/scripts/phastCons.sh $PHASTCONS $DIR_BASE/conservation/approach2/combinations.txt $CHR $DIR_OUTPUT $MAF | awk '{print $4}' > job.jid
+    sbatch --partition=tux --array=1-$(wc -l < $DIR_BASE/conservation/approach2/combinations.txt)%192 --cpus-per-task=1 --output=$DIR_OUTPUT/LOG/slurm-%A_%a.log $DIR_BASE/scripts/phastCons.sh $PHASTCONS $DIR_BASE/conservation/approach2/combinations.txt $CHR $DIR_OUTPUT $MAF | awk '{print $4}' > job.jid
 done
 ```
 
@@ -268,6 +274,33 @@ done
     CHR=chr$c
     sort -k 5,5n $CHR/*.jaccards.tsv | tail -n 1 | awk -v OFS='\t' -v chr=$CHR '{print(chr,$1,$2,$5)}'
 done) | column -t
+# With CDSs
+    # chr    len  tc    jaccard
+    # chr1   50   0.05  0.070778
+    # chr2   500  0.40  0.0742879
+    # chr3   50   0.40  0.107079
+    # chr4   50   0.15  0.0979271
+    # chr5   50   0.40  0.0927248
+    # chr6   150  0.40  0.118965
+    # chr7   50   0.50  0.0987415
+    # chr8   50   0.30  0.0792627
+    # chr9   50   0.15  0.0756086
+    # chr10  50   0.40  0.0944841
+    # chr11  50   0.05  0.0732512
+    # chr12  50   0.45  0.110227
+    # chr13  50   0.30  0.115297
+    # chr14  50   0.35  0.113371
+    # chr15  50   0.40  0.112432
+    # chr16  50   0.20  0.0891815
+    # chr17  50   0.05  0.0711152
+    # chr18  50   0.25  0.0931529
+    # chr19  50   0.05  0.110968
+    # chr20  50   0.15  0.0944569
+    # chr21  50   0.10  0.0853411
+    # chr22  50   0.10  0.0820875
+    # chrX   150  0.20  0.123566
+    # chrY   50   0.30  0.0751899
+# With exons
     # chr    len    tc    jaccard
     # chr1   100    0.50  0.119494
     # chr2   50     0.50  0.102332
@@ -298,7 +331,7 @@ done) | column -t
 Compute all outputs for the winning combinations:
 
 ```shell
-ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | sort -V | while read MAF; do
+ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | grep chrALL -v | sort -V | while read MAF; do
     MAF_NAME=$(basename $MAF .filtered.maf)
 
     CHR_WITH_SUFFIX="${MAF##*#chr}"
@@ -311,7 +344,24 @@ ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | sort -V | while read MAF; do
     len=$(sort -k 5,5n $DIR_OUTPUT/*.jaccards.tsv | tail -n 1 | cut -f 1)
     tc=$(sort -k 5,5n $DIR_OUTPUT/*.jaccards.tsv | tail -n 1 | cut -f 2)
 
-    sbatch -c 96 -p tux --wrap "hostname; cd $DIR_BASE/conservation/approach2; $PHASTCONS --most-conserved $DIR_OUTPUT/ELEMENTS/$CHR.conserved.$tc.$len.bed --target-coverage $tc --expected-length $len --rho 0.3 --msa-format MAF $MAF $DIR_OUTPUT/$CHR.4d.mod > $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.wig; $WIGTOBIGWIG $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.wig $DIR_BASE/conservation/chrom.sizes $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.bw; bgzip -l 9 -@ 48 $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.wig"
+    sbatch -p tux --wrap "hostname; cd $DIR_BASE/conservation/approach2; $PHASTCONS --most-conserved $DIR_OUTPUT/ELEMENTS/$CHR.conserved.$tc.$len.bed --target-coverage $tc --expected-length $len --rho 0.3 --msa-format MAF $MAF $DIR_OUTPUT/$CHR.4d.mod > $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.wig; $WIGTOBIGWIG $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.wig $DIR_BASE/conservation/chrom.sizes $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.bw; bgzip -l 9 -@ 48 $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.wig"
+done
+
+ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | grep chrALL -v | sort -V | while read MAF; do
+    MAF_NAME=$(basename $MAF .filtered.maf)
+
+    CHR_WITH_SUFFIX="${MAF##*#chr}"
+    CHROMOSOME_NUM="${CHR_WITH_SUFFIX%%.*}"
+    CHR="chr${CHROMOSOME_NUM}"
+    echo $MAF $CHR
+
+    DIR_OUTPUT=$DIR_BASE/conservation/approach2/$NAME.filter10Mb/$CHR
+    mkdir -p $DIR_OUTPUT/UPLOADED
+
+    len=$(sort -k 5,5n $DIR_OUTPUT/*.jaccards.tsv | tail -n 1 | cut -f 1)
+    tc=$(sort -k 5,5n $DIR_OUTPUT/*.jaccards.tsv | tail -n 1 | cut -f 2)
+
+    cp "$DIR_OUTPUT/ELEMENTS/$CHR.conserved.$tc.$len.bed" "/scratch/chm13#1#$CHR.most_conserved.bed"
 done
 ```
 
@@ -321,12 +371,12 @@ Combine chromosomes:
 NAME=chm13#1.p70.aln
 REF=chm13#1
 mkdir -p $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED
-ls $DIR_BASE/conservation/approach2/$NAME.filter10Mb/chr*/SCORES/*wig.gz | sort -V | while read WIG; do
+ls $DIR_BASE/conservation/approach2/$NAME.filter10Mb/chr*/SCORES/*wig.gz | grep chrALL -v | sort -V | while read WIG; do
     zcat $WIG
-done > $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$REF.scores.wig
-$WIGTOBIGWIG $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$REF.scores.wig $DIR_BASE/conservation/chrom.sizes $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$REF.scores.bw
+done > /scratch/$REF.scores.wig 
+$WIGTOBIGWIG /scratch/$REF.scores.wig $DIR_BASE/conservation/chrom.sizes /scratch/$REF.scores.bw
 
-ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | sort -V | while read MAF; do
+ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | grep chrALL -v | sort -V | while read MAF; do
     MAF_NAME=$(basename $MAF .filtered.maf)
 
     CHR_WITH_SUFFIX="${MAF##*#chr}"
@@ -339,8 +389,71 @@ ls $DIR_BASE/conservation/$NAME.filter10Mb/*.maf | sort -V | while read MAF; do
     len=$(sort -k 5,5n $DIR_OUTPUT/*.jaccards.tsv | tail -n 1 | cut -f 1)
     tc=$(sort -k 5,5n $DIR_OUTPUT/*.jaccards.tsv | tail -n 1 | cut -f 2)
 
-    zcat $DIR_OUTPUT/ELEMENTS/$CHR.conserved.$tc.$len.bed
+    cat $DIR_OUTPUT/ELEMENTS/$CHR.conserved.$tc.$len.bed
 done | sort -k1,1 -k2,2n > $DIR_BASE/conservation/approach2/$NAME.filter10Mb/COMBINED/$REF.most_conserved.bed
+```
+
+### All chromosomes together
+
+Combine all MAF files:
+
+```shell
+NAME=chm13#1.p70.aln
+cd $DIR_BASE/conservation/$NAME.filter10Mb
+ls *.filtered.maf | sort -V | while read MAF; do
+	cat $MAF
+done > chm13#1#chrALL.filtered.maf
+```
+
+Grid search:
+
+```shell
+MAF="$DIR_BASE/conservation/$NAME.filter10Mb/chm13#1#chrALL.filtered.maf"
+CHR="chrALL"
+
+DIR_OUTPUT=$DIR_BASE/conservation/approach2/$NAME.filter10Mb/$CHR
+mkdir -p $DIR_OUTPUT
+cd $DIR_OUTPUT
+
+zcat $DIR_BASE/data/chm13v2.0_RefSeq_Liftoff_v5.1.gff3.gz | awk '$3 == "CDS"' | sed "s/chr[1-9XY]\|chr[12][0-9]/Homo_sapiens/g" > $DIR_OUTPUT/$CHR.chm13.cds.gff
+sort -k1,1 -k4,4n $DIR_OUTPUT/$CHR.chm13.cds.gff | bedtools merge > $DIR_OUTPUT/$CHR.chm13.cds.bed
+
+$MSA_VIEW $MAF --in-format MAF --4d --features $DIR_OUTPUT/$CHR.chm13.cds.gff > $DIR_OUTPUT/$CHR.4d-codons.ss
+$MSA_VIEW $DIR_OUTPUT/$CHR.4d-codons.ss --in-format SS --out-format SS --tuple-size 1 > $DIR_OUTPUT/$CHR.4d-sites.ss
+
+$PHYLOFIT --tree $DIR_BASE/data/primate_tree.nwk --msa-format SS --out-root $DIR_OUTPUT/$CHR.4d $DIR_OUTPUT/$CHR.4d-sites.ss
+
+mkdir -p $DIR_OUTPUT/LOG
+mkdir -p $DIR_OUTPUT/ELEMENTS
+mkdir -p $DIR_OUTPUT/SCORES
+sbatch --partition=tux --array=1-$(wc -l < $DIR_BASE/conservation/approach2/combinations.txt)%192 --cpus-per-task=1 --output=$DIR_OUTPUT/LOG/slurm-%A_%a.log $DIR_BASE/scripts/phastCons.sh $PHASTCONS $DIR_BASE/conservation/approach2/combinations.txt $CHR $DIR_OUTPUT $MAF | awk '{print $4}' > job.jid
+```
+
+Collect results:
+
+```shell
+cd $DIR_OUTPUT
+ls ELEMENTS/*bed |  while read BED; do
+    len=$(basename $BED .bed | rev | cut -f 1 -d '.' | rev);
+    tc=$(basename $BED .bed | rev | cut -f 2,3 -d '.' | rev);
+    bedtoolsJaccard=$(bedtools jaccard -a $CHR.chm13.cds.bed -b <(sed "s/chm13#1#$CHR/Homo_sapiens/g" $BED | awk '{print $1"\t"$2"\t"$3}') | tail -n1)
+    printf '%s\t' $len $tc ${bedtoolsJaccard[@]}
+    printf '\n'
+done > $CHR.jaccards.tsv
+```
+
+Compute all outputs for the winning combination:
+
+```shell
+MAF="$DIR_BASE/conservation/$NAME.filter10Mb/chm13#1#chrALL.filtered.maf"
+CHR="chrALL"
+
+DIR_OUTPUT=$DIR_BASE/conservation/approach2/$NAME.filter10Mb/$CHR
+
+len=$(sort -k 5,5n $DIR_OUTPUT/*.jaccards.tsv | tail -n 1 | cut -f 1)
+tc=$(sort -k 5,5n $DIR_OUTPUT/*.jaccards.tsv | tail -n 1 | cut -f 2)
+
+sbatch -p tux --wrap "hostname; cd $DIR_BASE/conservation/approach2; $PHASTCONS --most-conserved $DIR_OUTPUT/ELEMENTS/$CHR.conserved.$tc.$len.bed --target-coverage $tc --expected-length $len --rho 0.3 --msa-format MAF $MAF $DIR_OUTPUT/$CHR.4d.mod > $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.wig; $WIGTOBIGWIG $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.wig $DIR_BASE/conservation/chrom.sizes $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.bw; bgzip -l 9 -@ 48 $DIR_OUTPUT/SCORES/$MAF_NAME.scores.$tc.$len.wig"
 ```
 
 ## Results
